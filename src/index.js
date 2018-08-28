@@ -3,7 +3,6 @@ import LocalFile from './localFile'
 import BgzipIndexedFasta from './bgzipIndexedFasta'
 import IndexedFasta from './indexedFasta'
 
-
 // memoized
 class UnindexedFasta extends IndexedFasta {
   constructor({ fasta, path }) {
@@ -19,7 +18,6 @@ class UnindexedFasta extends IndexedFasta {
     return this.indexes
   }
 
-
   _generateFAI() {
     return this.fasta.createReadStream().then(stream => {
       const lines = readline.createInterface({
@@ -27,8 +25,8 @@ class UnindexedFasta extends IndexedFasta {
       })
       let offset = 0
       let found = false
-      let indexByName = {}
-      let indexById = {}
+      const indexByName = {}
+      const indexById = {}
       let seqname = null
       let id = 0
       let length = 0
@@ -38,16 +36,21 @@ class UnindexedFasta extends IndexedFasta {
           if (line.match(/^>/)) {
             const trim = line.replace(/^>/, '')
             const [name, ...description] = trim.split(' ')
-            if(seqname) {
-              ByName[seqname].length = length
+            if (seqname) {
+              indexByName[seqname].length = length
             }
-            if(id) {
-              indexById[id-1].length = length
+            if (id) {
+              indexById[id - 1].length = length
             }
             length = 0
             seqname = name
             indexById[id] = { description: description.join(' '), name, id }
-            indexByName[seqname] = { description: description.join(' '), name, id, start: 0 }
+            indexByName[seqname] = {
+              description: description.join(' '),
+              name,
+              id,
+              start: 0,
+            }
             found = true
             offset += line.length + 1
           } else {
@@ -66,7 +69,7 @@ class UnindexedFasta extends IndexedFasta {
           }
         })
         lines.on('close', () => {
-          indexById[id-1].length = length
+          indexById[id - 1].length = length
           indexByName[seqname].length = length
           resolve({ id: indexById, name: indexByName })
         })
