@@ -36,6 +36,9 @@ class LocalFile {
     }
     return this._stat
   }
+  async createReadStream() {
+    return fs.createReadStream(null, { fd: await this.fd })
+  }
 }
 
 module.exports = LocalFile
