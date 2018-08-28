@@ -6,6 +6,7 @@ describe('FASTA parser', () => {
   it('process unindexed fasta', async () => {
     const t = new UnindexedFasta({ fasta: testDataFile('phi-X174.fa') })
     expect(await t.getSequenceList()).toEqual(['NC_001422.1'])
+    expect(await t.getSequenceSizes()).toEqual({ 'NC_001422.1': 5386 })
     expect(await t.getResiduesByName('NC_001422.1', 0, 100)).toEqual(
       'GAGTTTTATCGCTTCCATGACGCAGAAGTTAACACTTTCGGATATTTCTGATGAGTCGAAAAATTATCTTGATAAAGCAGGAATTACTACTGCTTGTTTA',
     )

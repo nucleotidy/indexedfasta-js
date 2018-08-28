@@ -21,7 +21,6 @@ class UnindexedFasta extends IndexedFasta {
 
 
   _generateFAI() {
-    console.log(this.fasta)
     return this.fasta.createReadStream().then(stream => {
       const lines = readline.createInterface({
         input: stream,
@@ -47,19 +46,18 @@ class UnindexedFasta extends IndexedFasta {
             }
             length = 0
             seqname = name
-            console.log(seqname)
             indexById[id] = { description: description.join(' '), name, id }
             indexByName[seqname] = { description: description.join(' '), name, id, start: 0 }
             found = true
-            offset += line.length
+            offset += line.length + 1
           } else {
             if (found) {
               indexById[id].offset = offset
-              indexById[id].linelength = line.length
-              indexById[id].linebytes = line.length + 1
+              indexById[id].lineLength = line.length
+              indexById[id].lineBytes = line.length + 1
               indexByName[seqname].offset = offset
-              indexByName[seqname].linelength = line.length
-              indexByName[seqname].linebytes = line.length + 1
+              indexByName[seqname].lineLength = line.length
+              indexByName[seqname].lineBytes = line.length + 1
               id += 1
               found = false
             }
@@ -70,25 +68,11 @@ class UnindexedFasta extends IndexedFasta {
         lines.on('close', () => {
           indexById[id-1].length = length
           indexByName[seqname].length = length
-          console.log('end', JSON.stringify(indexByName, null, 4))
           resolve({ id: indexById, name: indexByName })
         })
       })
     })
   }
-
-  // async fetch(id, start, end) {
-  //   const data = await this.data
-  //   const entry = data.find(iter => iter.id === id)
-  //   const length = end - start
-  //   if (!entry) throw new Error(`no sequence with id ${id} exists`)
-  //   return entry.sequence.substr(start, length)
-  // }
-
-  // async getSequenceList() {
-  //   const data = await this.data
-  //   return data.map(entry => entry.id)
-  // }
 }
 
 export { UnindexedFasta, IndexedFasta, BgzipIndexedFasta }
